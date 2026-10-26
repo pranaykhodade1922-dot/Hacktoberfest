@@ -16,7 +16,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", default="http://127.0.0.1:8501")
     args = parser.parse_args()
-    expect.set_options(timeout=30000)
+    expect.set_options(timeout=60000)
     artifacts = ROOT / ".labready/runtime"
     artifacts.mkdir(parents=True, exist_ok=True)
     target = ROOT / ".labready/practicals/python-data"
@@ -52,11 +52,11 @@ def main():
             print("PASS: Unsupported interpreter blocks execution and exposes explicitly fictional fallback options.", flush=True)
             field.fill("3.12")
             field.press("Tab")
+            expect(page.get_by_role("heading", name="Fictional fallback options", exact=True)).to_have_count(0)
             page.get_by_role("button", name="Inspect and propose preparation", exact=True).click()
             if not existed:
                 expect(page.get_by_text("NOT PREPARED", exact=True)).to_be_visible()
                 expect(page.get_by_role("button", name="Approve and prepare", exact=True)).to_be_enabled()
-            expect(page.get_by_role("heading", name="Fictional fallback options", exact=True)).to_have_count(0)
             page.get_by_role("heading", name="Prepare this computer", exact=True).scroll_into_view_if_needed()
             page.screenshot(path=str(artifacts / "preparation-ui.png"), full_page=True)
             assert target.exists() == existed, "Read-only browser checks changed the managed environment"

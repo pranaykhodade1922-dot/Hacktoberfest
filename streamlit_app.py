@@ -363,11 +363,27 @@ def main():
 
     with request_panel:
         st.subheader("Define your practical")
-        st.caption("Enter practical specifications via structured form or natural language with local Gemma.")
+        st.markdown(f'<div class="model">Local model · {escape(conversation.agent.model)}</div>', unsafe_allow_html=True)
+        st.caption("Enter practical specifications via natural language with local Gemma or the structured form below.")
         
-        mode_tab1, mode_tab2 = st.tabs(["Structured Form (Deterministic)", "Natural Language (AI-Assisted)"])
+        mode_tab1, mode_tab2 = st.tabs(["Natural Language (AI-Assisted)", "Structured Form (Deterministic)"])
 
         with mode_tab1:
+            st.caption("Include a date, time window, student count, and software with exact versions.")
+            st.button("Load example", on_click=load_example, disabled=waiting)
+            with st.form("session_request"):
+                st.text_area("Session request or follow-up", key="request_text", height=160,
+                             placeholder="e.g. Check Python 3.12 for 60 students on 2026-10-27, 10:00 to 12:00.")
+                st.form_submit_button("Check readiness", type="primary", use_container_width=True,
+                                      on_click=queue_check, disabled=waiting)
+            st.caption("All session times use Asia/Kolkata. One working computer per student.")
+            if conversation.messages:
+                with st.expander("Conversation", expanded=bool(conversation.latest and conversation.latest.needs_clarification)):
+                    for message in conversation.messages:
+                        st.markdown("**You**" if message["role"] == "user" else "**LabReady**")
+                        st.text(message["text"])
+
+        with mode_tab2:
             with st.form("structured_practical_form"):
                 prac_name = st.text_input("Practical or Subject Name", value="Data Science Practical")
                 f_col1, f_col2 = st.columns(2)
@@ -408,22 +424,6 @@ def main():
                         st.session_state["pending_session"] = (new_sess, uuid4().hex)
                     except Exception as exc:
                         st.error(f"Invalid input: {exc}")
-
-        with mode_tab2:
-            st.markdown(f'<div class="model">Local model · {escape(conversation.agent.model)}</div>', unsafe_allow_html=True)
-            st.caption("Include a date, time window, student count, and software with exact versions.")
-            st.button("Load example", on_click=load_example, disabled=waiting)
-            with st.form("session_request"):
-                st.text_area("Session request or follow-up", key="request_text", height=160,
-                             placeholder="e.g. Check Python 3.12 for 60 students on 2026-10-27, 10:00 to 12:00.")
-                st.form_submit_button("Check readiness", type="primary", use_container_width=True,
-                                      on_click=queue_check, disabled=waiting)
-            st.caption("All session times use Asia/Kolkata. One working computer per student.")
-            if conversation.messages:
-                with st.expander("Conversation", expanded=bool(conversation.latest and conversation.latest.needs_clarification)):
-                    for message in conversation.messages:
-                        st.markdown("**You**" if message["role"] == "user" else "**LabReady**")
-                        st.text(message["text"])
 
     with result_panel:
         # Process deterministic pending session
