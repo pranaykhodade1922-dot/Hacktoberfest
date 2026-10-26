@@ -1,0 +1,10 @@
+{
+  "notice": "FICTIONAL DEMONSTRATION DATA. Not verified college availability.",
+  "labs": [
+    {"id":"lab-a","name":"Lab A","capacity":60,"total_computers":60,"working_computers":42,"software":[{"name":"Python","version":"3.12"}],"equipment":["projector","whiteboard"]},
+    {"id":"lab-b","name":"Lab B","capacity":65,"total_computers":65,"working_computers":65,"software":[{"name":"Python","version":"3.12"}],"equipment":["projector","whiteboard"]},
+    {"id":"lab-c","name":"Lab C","capacity":60,"total_computers":60,"working_computers":60,"software":[{"name":"Python","version":"3.10"}],"equipment":["projector","whiteboard"]},
+    {"id":"lab-d","name":"Lab D (Batch Capable)","capacity":35,"total_computers":35,"working_computers":35,"software":[{"name":"Python","version":"3.12"}],"equipment":["projector","whiteboard"]},
+    {"id":"lab-e","name":"Lab E (Robotics)","capacity":30,"total_computers":30,"working_computers":30,"software":[{"name":"ROS","version":"2.0"}],"equipment":["projector","robotic_arm"],"unverified_software":["ROS"]}
+  ]
+}

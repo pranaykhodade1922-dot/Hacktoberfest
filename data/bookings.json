@@ -1,0 +1,6 @@
+{
+  "notice": "FICTIONAL DEMONSTRATION DATA. Recommendations do not reserve a lab.",
+  "bookings": [
+    {"id":"booking-b-20261027-01","lab_id":"lab-b","date":"2026-10-27","start":"10:00","end":"12:00"}
+  ]
+}
