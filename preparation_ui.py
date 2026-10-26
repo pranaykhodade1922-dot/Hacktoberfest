@@ -19,6 +19,10 @@ def changed():
     st.session_state.pop("prep_ai_error", None)
 
 
+def load_prep_example():
+    st.session_state["prep_request_pending"] = PREP_EXAMPLE
+
+
 def render_stepper(stage: str):
     stages = [
         ("requirements", "1. Requirements"),
@@ -196,17 +200,18 @@ def render_preparation():
         st.markdown("**1. Practical requirements**")
         st.caption("Describe the practical requirements in natural language or enter exact requirements below.")
 
+        if "prep_request_pending" in st.session_state:
+            st.session_state["prep_request_input"] = st.session_state.pop("prep_request_pending")
+        elif "prep_request_input" not in st.session_state:
+            st.session_state["prep_request_input"] = PREP_EXAMPLE
+
         prompt_text = st.text_input(
             "Natural language practical request",
-            value=st.session_state.get("prep_request_text", PREP_EXAMPLE),
             key="prep_request_input",
             help="Example: Prepare this computer for Python 3.12 with NumPy and pandas."
         )
         col_ex, col_ai = st.columns([1, 2])
-        if col_ex.button("Load practical example", disabled=controller.busy):
-            st.session_state["prep_request_text"] = PREP_EXAMPLE
-            st.session_state["prep_request_input"] = PREP_EXAMPLE
-            st.rerun()
+        col_ex.button("Load practical example", on_click=load_prep_example, disabled=controller.busy)
 
         if col_ai.button("Interpret with Gemma (AI)", disabled=controller.busy):
             with st.spinner("Gemma is interpreting your practical request..."):
@@ -215,7 +220,7 @@ def render_preparation():
                     req = interpreter.interpret(prompt_text)
                     st.session_state["prep_interpreter_trace"] = interpreter.last_trace
                     if req:
-                        st.session_state["local_python_version"] = req.python_version
+                        st.session_state["local_python_version_pending"] = req.python_version
                         st.session_state["prep_clarification"] = None
                         st.session_state["prep_ai_error"] = None
                         st.success(f"Gemma validated requirements: Python {req.python_version} with NumPy and pandas.")
@@ -236,9 +241,13 @@ def render_preparation():
             st.error(st.session_state["prep_ai_error"])
 
         st.markdown("**Validated local requirements**")
+        if "local_python_version_pending" in st.session_state:
+            st.session_state["local_python_version"] = st.session_state.pop("local_python_version_pending")
+        elif "local_python_version" not in st.session_state:
+            st.session_state["local_python_version"] = "3.12"
+
         python_version = st.text_input(
             "Required local Python version",
-            value=st.session_state.get("local_python_version", "3.12"),
             key="local_python_version",
             on_change=changed,
             disabled=controller.busy,
@@ -246,7 +255,7 @@ def render_preparation():
         )
         st.write("Required packages: " + ", ".join(f"{name}=={pin}" for name, pin in PINS.items()))
         st.caption("Fixed, tested allowlist. Gemma cannot choose packages, commands, paths, URLs, or grant approval.")
-        st.text("Environment target: " + str(controller.service.target))
+        st.text("Exact target: " + str(controller.service.target))
         st.caption("The app's venv and global Python are never practical installation targets.")
 
         try:

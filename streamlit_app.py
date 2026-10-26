@@ -78,7 +78,9 @@ def new_session():
     st.session_state.pop("prep_ai_error", None)
     st.session_state.pop("prep_interpreter_trace", None)
     st.session_state["request_text"] = ""
-    st.session_state["prep_request_text"] = ""
+    st.session_state["prep_request_pending"] = ""
+    st.session_state.pop("local_python_version", None)
+    st.session_state.pop("local_python_version_pending", None)
 
 
 def load_example():

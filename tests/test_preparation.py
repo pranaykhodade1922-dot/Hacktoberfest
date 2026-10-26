@@ -253,6 +253,24 @@ class PreparationTests(unittest.TestCase):
         self.assertIsNone(controller.result)
         self.assertFalse(any(b.label == "Approve and prepare" for b in app.button))
 
+    def test_load_practical_example_button_no_widget_instantiation_error(self):
+        from preparation_agent import EXAMPLE as PREP_EXAMPLE
+        app = AppTest.from_file(ROOT / "streamlit_app.py", default_timeout=15)
+        app.run()
+        self.assertFalse(app.exception)
+        btn = next((b for b in app.button if b.label == "Load practical example"), None)
+        self.assertIsNotNone(btn)
+        btn.click().run()
+        self.assertFalse(app.exception)
+        inp = app.text_input(key="prep_request_input")
+        self.assertEqual(inp.value, PREP_EXAMPLE)
+        reset_btn = next((b for b in app.button if b.label == "New session"), None)
+        self.assertIsNotNone(reset_btn)
+        reset_btn.click().run()
+        self.assertFalse(app.exception)
+        inp = app.text_input(key="prep_request_input")
+        self.assertEqual(inp.value, "")
+
 
 class ProcessBoundaryTests(unittest.TestCase):
     def test_actual_read_only_command_and_timeout_capture(self):
