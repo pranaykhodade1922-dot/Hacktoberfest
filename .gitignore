@@ -12,6 +12,7 @@ __pycache__/
 # Environment and sensitive data
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 
